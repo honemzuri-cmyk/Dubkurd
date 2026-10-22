@@ -156,7 +156,7 @@
                 return;
             }
 
-            statusMessage.innerHTML = 'خەریکی خوێندنەوەی ڤیدیۆکە و نووسینی دەقی کوردییە بە شێوەیەکی ئۆتۆماتیکی... چاوەڕوان ببن...';
+            statusMessage.innerHTML = 'خەریکی وەرگێڕان و نووسینی دەقی کوردییە بە شێوەیەکی ئۆتۆماتیکی... چاوەڕوان ببن...';
             outputBox.style.display = 'none';
 
             try {
@@ -170,7 +170,7 @@
                     body: JSON.stringify({
                         contents: [{
                             parts: [
-                                { text: "ئەم ڤیدیۆیە شیکار بکە و قسەکانی ناو ڤیدیۆکە وەکو دەق بە زمانی کوردی (سۆرانی) بە شێوەیەکی ڕوان و ئۆتۆماتیکی بنووسە. تەنها وەرگێڕان و دەقەکە بنووسە بێ هیچ زیادەیەک." },
+                                { text: "تکایە ئەم ڤیدیۆیە شیکار بکە، قسەکانی ناو ڤیدیۆکە وەربگێڕە و بە تەواوی بە زمانی کوردی (سۆرانی) تەنها دەقە کوردییەکە بنووسە. بە هیچ شێوەیەک زمانێکی تر بەکار مەهێنە، تەنها کوردی." },
                                 {
                                     inline_data: {
                                         mime_type: videoInput.type || "video/mp4",
@@ -187,10 +187,10 @@
                 if (data.candidates && data.candidates[0].content.parts[0].text) {
                     const translatedText = data.candidates[0].content.parts[0].text;
                     kurdishTextArea.value = translatedText;
-                    statusMessage.innerHTML = 'سەرکەوتوو بوو! دەقەکە بە شێوەیەکی ئۆتۆماتیکی نووسرا، ئێستا دەتوانیت هەر هەڵەیەک هەبوو تێیدا دەستکاری بکەیت.';
+                    statusMessage.innerHTML = 'سەرکەوتوو بوو! دەقەکە بە کوردی نووسرا، دەتوانیت دەستکاری بکەیت ئەگەر پێویست بکات.';
                 } else {
-                    kurdishTextArea.value = "ناتوانرا دەقەکە بە ئۆتۆماتیکی وەربگێڕرێت.";
-                    statusMessage.innerHTML = 'تکایە دەقەکە خۆت پڕ بکەرەوە یان دووبارە هەوڵ بدە.';
+                    kurdishTextArea.value = "ناتوانرا دەقەکە بە کوردی وەربگێڕرێت.";
+                    statusMessage.innerHTML = 'تکایە دووبارە هەوڵ بدە.';
                 }
 
                 const videoURL = URL.createObjectURL(videoInput);
