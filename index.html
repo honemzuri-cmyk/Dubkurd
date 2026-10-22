@@ -57,7 +57,7 @@
         }
         textarea {
             resize: vertical;
-            height: 90px;
+            height: 110px;
         }
         button {
             width: 100%;
@@ -98,10 +98,10 @@
 
     <div class="container">
         <h2>DubKurd</h2>
-        <p class="subtitle">دۆبلاژ و وەرگێڕانی ڤیدیۆ بە دەنگی کوردی و زیرەکی دەستکرد</p>
+        <p class="subtitle">وەرگێڕانی ئۆتۆماتیکی ڤیدیۆ بۆ کوردی (وەک Heygen)</p>
 
         <div class="form-group">
-            <label>کلیلی API (بۆ کارپێکردنی مۆدێلی AI):</label>
+            <label>کلیلی API (Gemini API Key):</label>
             <input type="password" id="apiKey" placeholder="کلیلی API لێرە بنووسە...">
         </div>
 
@@ -113,23 +113,23 @@
         <div class="form-group">
             <label>شێوازی دەنگ (Voice Selection):</label>
             <select id="voiceOption">
-                <option value="original">پاراستنی دەنگی ڕەسەنی ناو ڤیدیۆکە (Voice Cloning)</option>
-                <option value="male1">دەنگی پیاوانەی گەنج (AI Male Voice)</option>
-                <option value="female1">دەنگی ژنانەی گەنج (AI Female Voice)</option>
+                <option value="original">پاراستنی دەنگی ڕەسەنی ناو ڤیدیۆکە</option>
+                <option value="male1">دەنگی پیاوانەی گەنج</option>
+                <option value="female1">دەنگی ژنانەی گەنج</option>
             </select>
         </div>
 
         <div class="form-group">
-            <label>دەقی کوردی (وەرگێڕانی ئۆتۆماتیکی یان دەستکاریی دەستی):</label>
-            <textarea id="kurdishText" placeholder="بە شێوەی خۆکار لێرە پڕ دەبێتەوە، یان دەتوانیت خۆت دەستکاری بکەیت..."></textarea>
+            <label>دەقی کوردی (ئۆتۆماتیکی پڕ دەبێتەوە + دەستکاریی دەستی):</label>
+            <textarea id="kurdishText" placeholder="کاتێک دەست پێ دەکەیت، دەقەکە بە شێوەیەکی ئۆتۆماتیکی لێرە دەنوسرێت و دەتوانیت دەستکاری بکەیت..."></textarea>
         </div>
 
-        <button onclick="processAIDubbing()">دەستپێکردنی دۆبلاژ و وەرگێڕان</button>
+        <button onclick="processAIDubbing()">وەرگێڕانی ئۆتۆماتیکی دەق لە ڤیدیۆ</button>
 
         <div class="status" id="statusMessage"></div>
 
         <div class="output-box" id="outputBox">
-            <label>ڤیدیۆی دۆبلاژکراوی ئامادە:</label>
+            <label>ڤیدیۆی ئەنجام:</label>
             <video id="resultVideo" controls></video>
             <br>
             <a id="downloadLink" style="display:inline-block; margin-top:10px; color:#38bdf8; text-decoration:underline;" download="dubbed_video.mp4">داگرتنی ڤیدیۆ</a>
@@ -140,9 +140,8 @@
         async function processAIDubbing() {
             const apiKey = document.getElementById('apiKey').value;
             const videoInput = document.getElementById('videoFile').files[0];
-            const voiceOption = document.getElementById('voiceOption').value;
-            const kurdishTextArea = document.getElementById('kurdishText');
             const statusMessage = document.getElementById('statusMessage');
+            const kurdishTextArea = document.getElementById('kurdishText');
             const outputBox = document.getElementById('outputBox');
             const resultVideo = document.getElementById('resultVideo');
             const downloadLink = document.getElementById('downloadLink');
@@ -157,11 +156,11 @@
                 return;
             }
 
-            statusMessage.innerHTML = 'خەریکی پەیوەندیکردن بە مۆدێلی Gemini AI بۆ شیکاری و وەرگێڕانی ئۆتۆماتیکی بۆ زمانی کوردی...';
+            statusMessage.innerHTML = 'خەریکی خوێندنەوەی ڤیدیۆکە و نووسینی دەقی کوردییە بە شێوەیەکی ئۆتۆماتیکی... چاوەڕوان ببن...';
             outputBox.style.display = 'none';
 
             try {
-                const promptText = "ئەم ڤیدیۆیە یان فایلە دەنگییە شیکار بکە و دەقەکەی وەربگێڕە سەر زمانی کوردی (سۆرانی) بە شێوازێکی سروشتی و ڕوان، تەنها وەرگێڕانەکە بنووسە بێ هیچ زیادەیەک.";
+                const base64Data = await fileToBase64(videoInput);
 
                 const response = await fetch(https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}, {
                     method: 'POST',
@@ -171,11 +170,11 @@
                     body: JSON.stringify({
                         contents: [{
                             parts: [
-                                { text: promptText },
+                                { text: "ئەم ڤیدیۆیە شیکار بکە و قسەکانی ناو ڤیدیۆکە وەکو دەق بە زمانی کوردی (سۆرانی) بە شێوەیەکی ڕوان و ئۆتۆماتیکی بنووسە. تەنها وەرگێڕان و دەقەکە بنووسە بێ هیچ زیادەیەک." },
                                 {
                                     inline_data: {
                                         mime_type: videoInput.type || "video/mp4",
-                                        data: await fileToBase64(videoInput)
+                                        data: base64Data
                                     }
                                 }
                             ]
@@ -188,10 +187,10 @@
                 if (data.candidates && data.candidates[0].content.parts[0].text) {
                     const translatedText = data.candidates[0].content.parts[0].text;
                     kurdishTextArea.value = translatedText;
-                    statusMessage.innerHTML = 'سەرکەوتوو بوو! وەرگێڕانی ئۆتۆماتیکی کرا و دەتوانیت دەستکاری بکەیت.';
+                    statusMessage.innerHTML = 'سەرکەوتوو بوو! دەقەکە بە شێوەیەکی ئۆتۆماتیکی نووسرا، ئێستا دەتوانیت هەر هەڵەیەک هەبوو تێیدا دەستکاری بکەیت.';
                 } else {
-                    kurdishTextArea.value = "ناتوانرا دەقەکە بە ئۆتۆماتیکی وەربگێڕرێت، تکایە خۆت دەقەکە لێرە بنووسە.";
-                    statusMessage.innerHTML = 'وەرگێڕان تەواو بوو، دەتوانیت دەستکاری دەقەکە بکەیت.';
+                    kurdishTextArea.value = "ناتوانرا دەقەکە بە ئۆتۆماتیکی وەربگێڕرێت.";
+                    statusMessage.innerHTML = 'تکایە دەقەکە خۆت پڕ بکەرەوە یان دووبارە هەوڵ بدە.';
                 }
 
                 const videoURL = URL.createObjectURL(videoInput);
@@ -201,7 +200,7 @@
 
             } catch (error) {
                 console.error(error);
-                statusMessage.innerHTML = 'هەڵەیەک ڕوویدا لە پەیوەندیکردن بە API: ' + error.message;
+                statusMessage.innerHTML = 'هەڵەیەک ڕوویدا: ' + error.message;
             }
         }
 
